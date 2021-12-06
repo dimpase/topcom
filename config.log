@@ -523,7 +523,19 @@ config.status:1078: creating lib-src/Makefile
 config.status:1078: creating lib-src-reg/Makefile
 config.status:1078: creating src/Makefile
 config.status:1078: creating src-reg/Makefile
-config.status:1064: error: cannot find input file: `examples/Makefile.in'
+config.status:1078: creating examples/Makefile
+config.status:1078: creating wrap-gmp-gmpxx/Makefile
+config.status:1078: creating Makefile
+config.status:1250: executing depfiles commands
+config.status:1327: cd lib-src       && sed -e '/# am--include-marker/d' Makefile         | make -j4 -f - am--depfiles
+config.status:1332: $? = 0
+config.status:1327: cd lib-src-reg       && sed -e '/# am--include-marker/d' Makefile         | make -j4 -f - am--depfiles
+config.status:1332: $? = 0
+config.status:1327: cd src       && sed -e '/# am--include-marker/d' Makefile         | make -j4 -f - am--depfiles
+config.status:1332: $? = 0
+config.status:1327: cd src-reg       && sed -e '/# am--include-marker/d' Makefile         | make -j4 -f - am--depfiles
+config.status:1332: $? = 0
+config.status:1250: executing libtool commands
 
 ## ---------------- ##
 ## Cache variables. ##
@@ -799,4 +811,4 @@ target_alias=''
 #define STDC_HEADERS 1
 #define HAVE_LIBGMP 1
 
-configure: exit 1
+configure: exit 0

@@ -18,7 +18,7 @@ cp -p patches/lib-src-reg-Makefile.am     lib-src-reg/Makefile.am
 cp -p patches/wrap-gmp-gmpxx-Makefile.am  wrap-gmp-gmpxx/Makefile.am
 
 # Makefile.am with all examples deleted to save disk space
-cp -p "$PATCHES"/examples-Makefile.am     examples/Makefile.am
+cp -p patches/examples-Makefile.am     examples/Makefile.am
 
 # regenerate auto-generated files
 libtoolize   # only needed because of our broken autotools package
