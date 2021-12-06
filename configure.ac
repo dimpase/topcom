@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT([TOPCOM],[0.17.8])
 AM_INIT_AUTOMAKE
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_HEADERS([lib-src-reg/LPinterface.in:lib-src-reg/LPinterface.hh])
+AC_CONFIG_HEADERS([lib-src-reg/LPinterface.hh])
 
 dnl Checks for programs.
 AC_PROG_CC
