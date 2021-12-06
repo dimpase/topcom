@@ -9,6 +9,7 @@
 #ifndef LPINTERFACE_HH
 #define LPINTERFACE_HH
 
+#include "config.h"
 #include CDDLIB_SETOPER_H
 #include "Rational.h"
 

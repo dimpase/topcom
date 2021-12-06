@@ -394,7 +394,7 @@ on `(hostname || uname -n) 2>/dev/null | sed 1q`
 
 # Files that config.status was made for.
 config_files=" lib-src/Makefile lib-src-reg/Makefile src/Makefile src-reg/Makefile examples/Makefile wrap-gmp-gmpxx/Makefile Makefile"
-config_headers=" lib-src-reg/LPinterface.hh"
+config_headers=" lib-src-reg/config.h"
 config_commands=" depfiles libtool"
 
 ac_cs_usage="\
@@ -802,7 +802,7 @@ fi
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
-    "lib-src-reg/LPinterface.hh") CONFIG_HEADERS="$CONFIG_HEADERS lib-src-reg/LPinterface.hh" ;;
+    "lib-src-reg/config.h") CONFIG_HEADERS="$CONFIG_HEADERS lib-src-reg/config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "lib-src/Makefile") CONFIG_FILES="$CONFIG_FILES lib-src/Makefile" ;;
