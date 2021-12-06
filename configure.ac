@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT([TOPCOM],[0.17.7])
+AC_INIT([TOPCOM],[0.17.8])
 AM_INIT_AUTOMAKE
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -26,7 +26,7 @@ dnl              [csh -c 'echo soplex not found: --soplex will not work.'])
 
 dnl Find the GNU Multiple Precision Arithmetic Library
 AC_ARG_WITH(gmp,
-  [AS_HELP_STRING([--with-gmp=<path>],	
+  [AS_HELP_STRING([--with-gmp=<path>],
      	          [prefix of GMP installation. e.g. /usr/local or /usr])],
   [GMP_PREFIX="$with_gmp"],
   [AC_CHECK_LIB([gmp], [__gmpz_init], ,
@@ -49,7 +49,7 @@ AC_SUBST(GMP_CFLAGS)
 
 dnl Find the cdd library
 AC_ARG_WITH(cdd,
-  [AS_HELP_STRING([--with-cdd=<path>],	
+  [AS_HELP_STRING([--with-cdd=<path>],
      	          [prefix of cddlib installation. e.g. /usr/local or /usr])],
   [CDD_PREFIX="$with_cdd"],
   [AC_CHECK_LIB([cdd], [ddd_init], ,
@@ -76,11 +76,11 @@ dnl ===== End checks for libraries ================
 
 dnl Finishing it up
 AC_CONFIG_FILES([
-  lib-src/Makefile 
-  lib-src-reg/Makefile 
-  src/Makefile 
-  src-reg/Makefile 
-  examples/Makefile 
+  lib-src/Makefile
+  lib-src-reg/Makefile
+  src/Makefile
+  src-reg/Makefile
+  examples/Makefile
   wrap-gmp-gmpxx/Makefile
   Makefile
 ])
