@@ -47,28 +47,23 @@ AC_SUBST(GMP_LIBS)
 AC_SUBST(GMP_CFLAGS)
 
 
-dnl Find the cdd library
-AC_ARG_WITH(cdd,
-  [AS_HELP_STRING([--with-cdd=<path>],
-     	          [prefix of cddlib installation. e.g. /usr/local or /usr])],
-  [CDD_PREFIX="$with_cdd"],
-  [AC_CHECK_LIB([cdd], [ddd_init], ,
-    AC_MSG_ERROR([Komei Fukuda's cdd library not found.
-    Maybe you want to call configure with the --with-cdd=<path> option?
-    This tells configure where to find the cdd library and headers.
-    e.g. --with-cdd=/usr/local or --with-cdd=/usr]))]
-)
-if test "x$CDD_PREFIX" != x ; then
-  CDD_LIBS=" -L${CDD_PREFIX}/lib"
-  CDD_CFLAGS=" -I${CDD_PREFIX}/include"
-else
-  CDD_LIBS=""
-  # Fedora 12 installs the headers here
-  CDD_CFLAGS=" -I/usr/include/cddlib"
+# Cddlib library
+LB_CHECK_CDDLIB
+if test "x$cddlib_found" = "xno" ; then
+    # Older versions of cddlib are compiled with the C compiler;
+    # also some people compile newer versions with the C compiler instead of the C++ compiler.
+    AC_LANG(C)
+    LB_CHECK_CDDLIB
+    if test "x$cddlib_found" = "xyes" ; then
+        AC_DEFINE(HAVE_CDDLIB_C_LINKAGE, 1, [Define if the cddlib library has C linkage])
+    fi
+    AC_LANG(C++)
 fi
-CDD_LIBS="${CDD_LIBS} -lcddgmp"
-AC_SUBST(CDD_LIBS)
-AC_SUBST(CDD_CFLAGS)
+if test "x$cddlib_found" = "xno" ; then
+    AC_MSG_ERROR([The cddlib headers and library are required for topcom.])
+fi
+AC_CACHE_SAVE
+
 
 
 dnl ===== End checks for libraries ================

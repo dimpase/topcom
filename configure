@@ -632,8 +632,10 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
-CDD_CFLAGS
-CDD_LIBS
+HAVE_CDDLIB_FALSE
+HAVE_CDDLIB_TRUE
+CDDLIB_LIBS
+CDDLIB_CFLAGS
 GMP_CFLAGS
 GMP_LIBS
 CXXCPP
@@ -771,7 +773,7 @@ with_gnu_ld
 with_sysroot
 enable_libtool_lock
 with_gmp
-with_cdd
+with_cddlib
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1440,8 +1442,13 @@ Optional Packages:
   --with-sysroot[=DIR]    Search for dependent libraries within DIR (or the
                           compiler's sysroot if not specified).
   --with-gmp=<path>       prefix of GMP installation. e.g. /usr/local or /usr
-  --with-cdd=<path>       prefix of cddlib installation. e.g. /usr/local or
-                          /usr
+  --with-cddlib=<path>|yes|no
+					   Use cddlib.
+					   If argument is no, you do not have the library installed on your machine (set as default).
+					   If argument is yes or <empty> that means the library is reachable with the standard
+					   search path.
+	 				   Otherwise you give the <path> to the directory which contain the library.
+
 
 Some influential environment variables:
   CC          C compiler command
@@ -15993,74 +16000,404 @@ GMP_LIBS="${GMP_LIBS} -lgmp -lgmpxx"
 
 
 
+# Cddlib library
 
-# Check whether --with-cdd was given.
-if test "${with_cdd+set}" = set; then :
-  withval=$with_cdd; CDD_PREFIX="$with_cdd"
+
+CDDLIB_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+
+
+# Check whether --with-cddlib was given.
+if test "${with_cddlib+set}" = set; then :
+  withval=$with_cddlib; if test "$withval" = yes ; then
+			CDDLIB_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+	      elif test "$withval" != no ; then
+			CDDLIB_HOME_PATH="$withval"
+	     fi
+fi
+
+
+min_cddlib_version=093c
+
+
+
+BACKUP_CXXFLAGS=${CXXFLAGS}
+BACKUP_CFLAGS=${CFLAGS}
+BACKUP_LIBS=${LIBS}
+
+if test -n "$CDDLIB_HOME_PATH" ; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for CDDLIB >= $min_cddlib_version" >&5
+$as_echo_n "checking for CDDLIB >= $min_cddlib_version... " >&6; }
+fi
+
+for CDDLIB_HOME in ${CDDLIB_HOME_PATH}
+ do
+	if test "$CDDLIB_HOME" != "DEFAULTS" ; then
+		CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include"
+		CDDLIB_LIBS="-L${CDDLIB_HOME}/lib -lcddgmp"
+	else
+		CDDLIB_CFLAGS=
+		CDDLIB_LIBS="-lcddgmp"
+	fi
+	CXXFLAGS="${CDDLIB_CFLAGS} ${GMP_CFLAGS} ${BACKUP_CXXFLAGS} "
+	CFLAGS="${CDDLIB_CFLAGS} ${BACKUP_CFLAGS} {GMP_CFLAGS}"
+	LIBS="${CDDLIB_LIBS} ${GMP_LIBS} ${BACKUP_LIBS}"
+
+
+    cddlib_found=no
+        for cdd_h_path in "cddlib/" "" "cdd/"
+        do
+            if test -z $cdd_h_path; then :
+  cdd_h_path_print="inclusion directory"
 else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ddd_init in -lcdd" >&5
-$as_echo_n "checking for ddd_init in -lcdd... " >&6; }
-if ${ac_cv_lib_cdd_ddd_init+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcdd  $LIBS"
+  cdd_h_path_print="${cdd_h_path}"
+fi
+
+cdd_header_found=no
+
+cat >>confdefs.h <<_ACEOF
+#define CDDLIB_SETOPER_H <${cdd_h_path}setoper.h>
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define CDDLIB_CDDMP_H <${cdd_h_path}cddmp.h>
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define CDDLIB_CDD_H <${cdd_h_path}cdd.h>
+_ACEOF
+
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char ddd_init ();
+#define GMPRATIONAL
+#include CDDLIB_SETOPER_H
+#include CDDLIB_CDDMP_H
+#include CDDLIB_CDD_H
+
 int
 main ()
 {
-return ddd_init ();
+ mytype a;
+  dd_init(a);
+  dd_abs(a, a);
+
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_cdd_ddd_init=yes
-else
-  ac_cv_lib_cdd_ddd_init=no
+         cdd_header_found=yes
+
+
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
+
+            if test "x$cdd_header_found" = "xyes"; then :
+
+                { $as_echo "$as_me:${as_lineno-$LINENO}: headers are in ${cdd_h_path_print}" >&5
+$as_echo "$as_me: headers are in ${cdd_h_path_print}" >&6;}
+                cddlib_found=yes
+                break
+
+else
+
+                { $as_echo "$as_me:${as_lineno-$LINENO}: headers are not in ${cdd_h_path_print}" >&5
+$as_echo "$as_me: headers are not in ${cdd_h_path_print}" >&6;}
+
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cdd_ddd_init" >&5
-$as_echo "$ac_cv_lib_cdd_ddd_init" >&6; }
-if test "x$ac_cv_lib_cdd_ddd_init" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBCDD 1
+    done
+
+	if test "x$cddlib_found" = "xyes" ; then
+	    break
+	fi
+done
+
+if test "x$cddlib_found" = "xyes" ; then
+
+
+
+$as_echo "#define HAVE_CDDLIB 1" >>confdefs.h
+
+	HAVE_CDDLIB=yes
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: found" >&5
+$as_echo "found" >&6; }
+else
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: not found" >&5
+$as_echo "not found" >&6; }
+	:
+fi
+
+ if test "x$HAVE_CDDLIB" = "xyes"; then
+  HAVE_CDDLIB_TRUE=
+  HAVE_CDDLIB_FALSE='#'
+else
+  HAVE_CDDLIB_TRUE='#'
+  HAVE_CDDLIB_FALSE=
+fi
+
+
+CXXFLAGS=${BACKUP_CXXFLAGS}
+CFLAGS=${BACKUP_CFLAGS}
+LIBS=${BACKUP_LIBS}
+#unset LD_LIBRARY_PATH
+
+
+if test "x$cddlib_found" = "xno" ; then
+    # Older versions of cddlib are compiled with the C compiler;
+    # also some people compile newer versions with the C compiler instead of the C++ compiler.
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
+CDDLIB_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+
+
+# Check whether --with-cddlib was given.
+if test "${with_cddlib+set}" = set; then :
+  withval=$with_cddlib; if test "$withval" = yes ; then
+			CDDLIB_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+	      elif test "$withval" != no ; then
+			CDDLIB_HOME_PATH="$withval"
+	     fi
+fi
+
+
+min_cddlib_version=093c
+
+
+
+BACKUP_CXXFLAGS=${CXXFLAGS}
+BACKUP_CFLAGS=${CFLAGS}
+BACKUP_LIBS=${LIBS}
+
+if test -n "$CDDLIB_HOME_PATH" ; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for CDDLIB >= $min_cddlib_version" >&5
+$as_echo_n "checking for CDDLIB >= $min_cddlib_version... " >&6; }
+fi
+
+for CDDLIB_HOME in ${CDDLIB_HOME_PATH}
+ do
+	if test "$CDDLIB_HOME" != "DEFAULTS" ; then
+		CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include"
+		CDDLIB_LIBS="-L${CDDLIB_HOME}/lib -lcddgmp"
+	else
+		CDDLIB_CFLAGS=
+		CDDLIB_LIBS="-lcddgmp"
+	fi
+	CXXFLAGS="${CDDLIB_CFLAGS} ${GMP_CFLAGS} ${BACKUP_CXXFLAGS} "
+	CFLAGS="${CDDLIB_CFLAGS} ${BACKUP_CFLAGS} {GMP_CFLAGS}"
+	LIBS="${CDDLIB_LIBS} ${GMP_LIBS} ${BACKUP_LIBS}"
+
+
+    cddlib_found=no
+        for cdd_h_path in "cddlib/" "" "cdd/"
+        do
+            if test -z $cdd_h_path; then :
+  cdd_h_path_print="inclusion directory"
+else
+  cdd_h_path_print="${cdd_h_path}"
+fi
+
+cdd_header_found=no
+
+cat >>confdefs.h <<_ACEOF
+#define CDDLIB_SETOPER_H <${cdd_h_path}setoper.h>
 _ACEOF
 
-  LIBS="-lcdd $LIBS"
+
+cat >>confdefs.h <<_ACEOF
+#define CDDLIB_CDDMP_H <${cdd_h_path}cddmp.h>
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define CDDLIB_CDD_H <${cdd_h_path}cdd.h>
+_ACEOF
+
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#define GMPRATIONAL
+#include CDDLIB_SETOPER_H
+#include CDDLIB_CDDMP_H
+#include CDDLIB_CDD_H
+
+int
+main ()
+{
+ mytype a;
+  dd_init(a);
+  dd_abs(a, a);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+         cdd_header_found=yes
+
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+            if test "x$cdd_header_found" = "xyes"; then :
+
+                { $as_echo "$as_me:${as_lineno-$LINENO}: headers are in ${cdd_h_path_print}" >&5
+$as_echo "$as_me: headers are in ${cdd_h_path_print}" >&6;}
+                cddlib_found=yes
+                break
 
 else
-  as_fn_error $? "Komei Fukuda's cdd library not found.
-    Maybe you want to call configure with the --with-cdd=<path> option?
-    This tells configure where to find the cdd library and headers.
-    e.g. --with-cdd=/usr/local or --with-cdd=/usr" "$LINENO" 5
-fi
 
+                { $as_echo "$as_me:${as_lineno-$LINENO}: headers are not in ${cdd_h_path_print}" >&5
+$as_echo "$as_me: headers are not in ${cdd_h_path_print}" >&6;}
 
 fi
+    done
 
-if test "x$CDD_PREFIX" != x ; then
-  CDD_LIBS=" -L${CDD_PREFIX}/lib"
-  CDD_CFLAGS=" -I${CDD_PREFIX}/include"
+	if test "x$cddlib_found" = "xyes" ; then
+	    break
+	fi
+done
+
+if test "x$cddlib_found" = "xyes" ; then
+
+
+
+$as_echo "#define HAVE_CDDLIB 1" >>confdefs.h
+
+	HAVE_CDDLIB=yes
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: found" >&5
+$as_echo "found" >&6; }
 else
-  CDD_LIBS=""
-  # Fedora 12 installs the headers here
-  CDD_CFLAGS=" -I/usr/include/cddlib"
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: not found" >&5
+$as_echo "not found" >&6; }
+	:
 fi
-CDD_LIBS="${CDD_LIBS} -lcddgmp"
 
+ if test "x$HAVE_CDDLIB" = "xyes"; then
+  HAVE_CDDLIB_TRUE=
+  HAVE_CDDLIB_FALSE='#'
+else
+  HAVE_CDDLIB_TRUE='#'
+  HAVE_CDDLIB_FALSE=
+fi
+
+
+CXXFLAGS=${BACKUP_CXXFLAGS}
+CFLAGS=${BACKUP_CFLAGS}
+LIBS=${BACKUP_LIBS}
+#unset LD_LIBRARY_PATH
+
+
+    if test "x$cddlib_found" = "xyes" ; then
+
+$as_echo "#define HAVE_CDDLIB_C_LINKAGE 1" >>confdefs.h
+
+    fi
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+fi
+if test "x$cddlib_found" = "xno" ; then
+    as_fn_error $? "The cddlib headers and library are required for topcom." "$LINENO" 5
+fi
+cat >confcache <<\_ACEOF
+# This file is a shell script that caches the results of configure
+# tests run on this system so they can be shared between configure
+# scripts and configure runs, see configure's option --config-cache.
+# It is not useful on other systems.  If it contains results you don't
+# want to keep, you may remove or edit it.
+#
+# config.status only pays attention to the cache file if you give it
+# the --recheck option to rerun configure.
+#
+# `ac_cv_env_foo' variables (set or unset) will be overridden when
+# loading this file, other *unset* `ac_cv_foo' will be assigned the
+# following values.
+
+_ACEOF
+
+# The following way of writing the cache mishandles newlines in values,
+# but we know of no workaround that is simple, portable, and efficient.
+# So, we kill variables containing newlines.
+# Ultrix sh set writes to stderr and can't be redirected directly,
+# and sets the high bit in the cache file unless we assign to the vars.
+(
+  for ac_var in `(set) 2>&1 | sed -n 's/^\([a-zA-Z_][a-zA-Z0-9_]*\)=.*/\1/p'`; do
+    eval ac_val=\$$ac_var
+    case $ac_val in #(
+    *${as_nl}*)
+      case $ac_var in #(
+      *_cv_*) { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: cache variable $ac_var contains a newline" >&5
+$as_echo "$as_me: WARNING: cache variable $ac_var contains a newline" >&2;} ;;
+      esac
+      case $ac_var in #(
+      _ | IFS | as_nl) ;; #(
+      BASH_ARGV | BASH_SOURCE) eval $ac_var= ;; #(
+      *) { eval $ac_var=; unset $ac_var;} ;;
+      esac ;;
+    esac
+  done
+
+  (set) 2>&1 |
+    case $as_nl`(ac_space=' '; set) 2>&1` in #(
+    *${as_nl}ac_space=\ *)
+      # `set' does not quote correctly, so add quotes: double-quote
+      # substitution turns \\\\ into \\, and sed turns \\ into \.
+      sed -n \
+	"s/'/'\\\\''/g;
+	  s/^\\([_$as_cr_alnum]*_cv_[_$as_cr_alnum]*\\)=\\(.*\\)/\\1='\\2'/p"
+      ;; #(
+    *)
+      # `set' quotes correctly as required by POSIX, so do not add quotes.
+      sed -n "/^[_$as_cr_alnum]*_cv_[_$as_cr_alnum]*=/p"
+      ;;
+    esac |
+    sort
+) |
+  sed '
+     /^ac_cv_env_/b end
+     t clear
+     :clear
+     s/^\([^=]*\)=\(.*[{}].*\)$/test "${\1+set}" = set || &/
+     t end
+     s/^\([^=]*\)=\(.*\)$/\1=${\1=\2}/
+     :end' >>confcache
+if diff "$cache_file" confcache >/dev/null 2>&1; then :; else
+  if test -w "$cache_file"; then
+    if test "x$cache_file" != "x/dev/null"; then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: updating cache $cache_file" >&5
+$as_echo "$as_me: updating cache $cache_file" >&6;}
+      if test ! -f "$cache_file" || test -h "$cache_file"; then
+	cat confcache >"$cache_file"
+      else
+        case $cache_file in #(
+        */* | ?:*)
+	  mv -f confcache "$cache_file"$$ &&
+	  mv -f "$cache_file"$$ "$cache_file" ;; #(
+        *)
+	  mv -f confcache "$cache_file" ;;
+	esac
+      fi
+    fi
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: not updating unwritable cache $cache_file" >&5
+$as_echo "$as_me: not updating unwritable cache $cache_file" >&6;}
+  fi
+fi
+rm -f confcache
 
 
 
@@ -16239,6 +16576,14 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCXX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CDDLIB_TRUE}" && test -z "${HAVE_CDDLIB_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CDDLIB\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CDDLIB_TRUE}" && test -z "${HAVE_CDDLIB_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CDDLIB\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
