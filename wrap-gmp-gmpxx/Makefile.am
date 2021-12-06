@@ -4,5 +4,3 @@ Rational.h
 
 AM_CPPFLAGS        = -I../external/include
 AM_CPPFLAGS       += -I$(includedir)
-
-AM_CXXFLAGS     = -O2

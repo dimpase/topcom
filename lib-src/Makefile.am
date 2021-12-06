@@ -1,6 +1,6 @@
-lib_LIBRARIES       = libTOPCOM.a
+lib_LTLIBRARIES       = libTOPCOM.la
 
-libTOPCOM_a_SOURCES = \
+libTOPCOM_la_SOURCES = \
 Admissibles.cc \
 CheckTriang.cc \
 Circuits.cc \
@@ -88,11 +88,11 @@ VertexFacetTable.hh \
 VertexFacetTableArray.hh \
 VirtualChiro.hh
 
-AM_CPPFLAGS     = -I../lib-src-reg
-AM_CPPFLAGS    += -I../wrap-gmp-gmpxx
-AM_CPPFLAGS    += -I../external/include
-AM_CPPFLAGS    += -I$(includedir)
 
-AM_CPPFLAGS    += -DVERBOSE -DGMPRATIONAL -ftemplate-depth-35
+libTOPCOM_la_CPPFLAGS = \
+	-DVERBOSE -DGMPRATIONAL -ftemplate-depth-35 \
+	$(GMP_CFLAGS) $(CDD_CFLAGS) \
+	-I../lib-src-reg -I../wrap-gmp-gmpxx 
 
-AM_CXXFLAGS     = -O2 -g
+libTOPCOM_la_LIBADD = $(GMP_LIBS) $(CDD_LIBS)
+
